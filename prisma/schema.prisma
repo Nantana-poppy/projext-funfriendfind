@@ -1,0 +1,130 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id           Int          @id @default(autoincrement())
+  firstName    String
+  lastName     String
+  username     String       @unique
+  email        String       @unique
+  password     String
+  profileImage String?
+  bio          String?
+  posts        Post[]
+  comments     Comment[]
+  likes        Like[]
+  trips        Trip[]       @relation("TripOwner")
+  tripMembers  TripMember[]
+  followers    Follow[]     @relation("Following")
+  following    Follow[]     @relation("Follower")
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+}
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  posts       Post[]
+  trips       Trip[]
+}
+
+model Post {
+  id         Int         @id @default(autoincrement())
+  userId     Int
+  categoryId Int?
+  caption    String      @db.Text
+  location   String?
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category?   @relation(fields: [categoryId], references: [id])
+  images     PostImage[]
+  comments   Comment[]
+  likes      Like[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+model PostImage {
+  id       Int    @id @default(autoincrement())
+  postId   Int
+  imageUrl String
+  post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  postId    Int
+  comment   String   @db.Text
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  postId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+}
+
+model Follow {
+  id          Int      @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  @@unique([followerId, followingId])
+}
+
+model Trip {
+  id          Int          @id @default(autoincrement())
+  ownerId     Int
+  categoryId  Int
+  title       String
+  destination String
+  startDate   DateTime
+  endDate     DateTime
+  maxMember   Int
+  description String       @db.Text
+  owner       User         @relation("TripOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  category    Category     @relation(fields: [categoryId], references: [id])
+  members     TripMember[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model TripMember {
+  id       Int        @id @default(autoincrement())
+  tripId   Int
+  userId   Int
+  status   TripStatus @default(PENDING)
+  trip     Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  joinedAt DateTime   @default(now())
+
+  @@unique([tripId, userId])
+}
+
+enum TripStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
