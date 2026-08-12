@@ -1,3 +1,4 @@
+import createError from "http-errors";
 import prisma from "../lib/prisma.js";
 import { hashPassword } from "../utilities/password.js";
 
@@ -11,7 +12,7 @@ export async function registerUser(data) {
   });
 
   if (existingUsername) {
-    throw new Error("Username already exists");
+    throw createError(409, "Username already exists");
   }
 
   const existingEmail = await prisma.user.findUnique({
@@ -21,7 +22,7 @@ export async function registerUser(data) {
   });
 
   if (existingEmail) {
-    throw new Error("Email already exists");
+    throw createError(409, "Email already exists");
   }
 
   const hashedPassword = await hashPassword(password);

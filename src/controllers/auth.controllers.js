@@ -9,21 +9,25 @@ export async function register(req, res, next) {
   // validation
   const { firstname, lastname, username, email, password, confirmPassword } =
     req.body;
-  const result = registerSchema.parse(req.body);
-  console.log("result", result);
-  const user = await registerUser(result);
+  try {
+    const result = registerSchema.parse(req.body);
+    console.log("result", result);
+    const user = await registerUser(result);
 
-  const token = await createToken(user);
-  res.status(201).json({
-    status: "success",
-    message: "Register successful",
-    token: token,
-    user: {
-      id: user.id,
-      username: user.username,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-    },
-  });
+    const token = await createToken(user);
+    res.status(201).json({
+      status: "success",
+      message: "Register successful",
+      token: token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
 }
