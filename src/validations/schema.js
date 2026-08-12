@@ -25,5 +25,5 @@ export const loginSchema = z.object({
     .refine((value) => emailRegex.test(value) || usernameRegex.test(value), {
       message: "Identity must be a valid email or username",
     }),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(1, "Password is required"),
 });

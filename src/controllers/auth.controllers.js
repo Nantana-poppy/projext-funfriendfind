@@ -1,7 +1,7 @@
 import createError from "http-errors";
 import prisma from "../lib/prisma.js";
-import { registerSchema } from "../validations/schema.js";
-import { registerUser } from "../services/auth.services.js";
+import { loginSchema, registerSchema } from "../validations/schema.js";
+import { loginUser, registerUser } from "../services/auth.services.js";
 import { hashPassword } from "../utilities/password.js";
 import { createToken } from "../utilities/jwt.js";
 
@@ -25,6 +25,29 @@ export async function register(req, res, next) {
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function login(req, res, next) {
+  const { identity, password } = req.body;
+  try {
+    const result = loginSchema.parse(req.body);
+    console.log("result", result);
+    const user = await loginUser(result.identity, result.password);
+
+    const token = await createToken(user);
+    res.status(200).json({
+      status: "success",
+      message: "Login successful",
+      token: token,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
       },
     });
   } catch (error) {

@@ -15,3 +15,13 @@ Content-Type: application/json
   "password": "12345678",
   "confirmPassword": "12345678"
 }
+
+###
+POST {{BASE_URL}}/auth/login
+Content-Type: application/json
+
+{
+
+  "identity": "ppscc1",
+  "password": "12345678"
+}
