@@ -1,5 +1,7 @@
 @BASE_URL = http://localhost:8899
 
+@UserToken = {{userLogin.response.body.token}}
+
 ###
 GET {{BASE_URL}}/check
 
@@ -8,8 +10,8 @@ POST {{BASE_URL}}/auth/register
 Content-Type: application/json
 
 {
-  "username": "ppscc1003",
-  "email": "ppscc1010@gmail.com",
+  "username": "ppscc1012",
+  "email": "ppscc1012@gmail.com",
   "firstName": "Nantana",
   "lastName": "Santaweesuk",
   "password": "12345678",
@@ -17,11 +19,17 @@ Content-Type: application/json
 }
 
 ###
+# @name userLogin
 POST {{BASE_URL}}/auth/login
 Content-Type: application/json
 
 {
 
-  "identity": "ppscc1",
+  "identity": "ppscc1012",
   "password": "12345678"
 }
+
+###
+# @name getMe
+GET {{BASE_URL}}/auth/me
+Authorization: Bearer {{UserToken}}

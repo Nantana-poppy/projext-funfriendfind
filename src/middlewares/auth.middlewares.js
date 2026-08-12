@@ -1,3 +1,4 @@
+import createError from "http-errors";
 import { verifyToken } from "../utilities/jwt.js";
 
 export function authenticate(req, res, next) {

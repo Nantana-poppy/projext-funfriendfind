@@ -43,3 +43,23 @@ export async function loginUser(identity, password) {
   }
   return user;
 }
+
+export async function getCurrentUser(userId) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      profileImage: true,
+      bio: true,
+      createdAt: true,
+    },
+  });
+  if (!user) {
+    throw createError(404, "User not found");
+  }
+  return user;
+}
