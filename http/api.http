@@ -1,0 +1,17 @@
+@BASE_URL = http://localhost:8899
+
+###
+GET {{BASE_URL}}/check
+
+###
+POST {{BASE_URL}}/auth/register
+Content-Type: application/json
+
+{
+  "username": "ppscc1003",
+  "email": "ppscc1003@gmail.com",
+  "firstName": "Nantana",
+  "lastName": "Santaweesuk",
+  "password": "12345678",
+  "confirmPassword": "12345678"
+}

@@ -1,10 +1,5 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -21,15 +16,15 @@ model User {
   password     String
   profileImage String?
   bio          String?
-  posts        Post[]
-  comments     Comment[]
-  likes        Like[]
-  trips        Trip[]       @relation("TripOwner")
-  tripMembers  TripMember[]
-  followers    Follow[]     @relation("Following")
-  following    Follow[]     @relation("Follower")
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+  comments     Comment[]
+  following    Follow[]     @relation("Follower")
+  followers    Follow[]     @relation("Following")
+  likes        Like[]
+  posts        Post[]
+  trips        Trip[]       @relation("TripOwner")
+  tripMembers  TripMember[]
 }
 
 model Category {
@@ -46,13 +41,16 @@ model Post {
   categoryId Int?
   caption    String      @db.Text
   location   String?
-  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category   Category?   @relation(fields: [categoryId], references: [id])
-  images     PostImage[]
-  comments   Comment[]
-  likes      Like[]
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
+  comments   Comment[]
+  likes      Like[]
+  category   Category?   @relation(fields: [categoryId], references: [id])
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  images     PostImage[]
+
+  @@index([categoryId], map: "Post_categoryId_fkey")
+  @@index([userId], map: "Post_userId_fkey")
 }
 
 model PostImage {
@@ -60,6 +58,8 @@ model PostImage {
   postId   Int
   imageUrl String
   post     Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId], map: "PostImage_postId_fkey")
 }
 
 model Comment {
@@ -67,31 +67,36 @@ model Comment {
   userId    Int
   postId    Int
   comment   String   @db.Text
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([postId], map: "Comment_postId_fkey")
+  @@index([userId], map: "Comment_userId_fkey")
 }
 
 model Like {
   id        Int      @id @default(autoincrement())
   userId    Int
   postId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, postId])
+  @@index([postId], map: "Like_postId_fkey")
 }
 
 model Follow {
   id          Int      @id @default(autoincrement())
   followerId  Int
   followingId Int
+  createdAt   DateTime @default(now())
   follower    User     @relation("Follower", fields: [followerId], references: [id], onDelete: Cascade)
   following   User     @relation("Following", fields: [followingId], references: [id], onDelete: Cascade)
-  createdAt   DateTime @default(now())
 
   @@unique([followerId, followingId])
+  @@index([followingId], map: "Follow_followingId_fkey")
 }
 
 model Trip {
@@ -104,11 +109,14 @@ model Trip {
   endDate     DateTime
   maxMember   Int
   description String       @db.Text
-  owner       User         @relation("TripOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  category    Category     @relation(fields: [categoryId], references: [id])
-  members     TripMember[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
+  category    Category     @relation(fields: [categoryId], references: [id])
+  owner       User         @relation("TripOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members     TripMember[]
+
+  @@index([categoryId], map: "Trip_categoryId_fkey")
+  @@index([ownerId], map: "Trip_ownerId_fkey")
 }
 
 model TripMember {
@@ -116,11 +124,12 @@ model TripMember {
   tripId   Int
   userId   Int
   status   TripStatus @default(PENDING)
+  joinedAt DateTime   @default(now())
   trip     Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
   user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  joinedAt DateTime   @default(now())
 
   @@unique([tripId, userId])
+  @@index([userId], map: "TripMember_userId_fkey")
 }
 
 enum TripStatus {
