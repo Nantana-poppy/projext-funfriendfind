@@ -10,8 +10,8 @@ POST {{BASE_URL}}/auth/register
 Content-Type: application/json
 
 {
-  "username": "ppscc1012",
-  "email": "ppscc1012@gmail.com",
+  "username": "ppscc1020",
+  "email": "ppscc1020@gmail.com",
   "firstName": "Nantana",
   "lastName": "Santaweesuk",
   "password": "12345678",
@@ -25,7 +25,7 @@ Content-Type: application/json
 
 {
 
-  "identity": "ppscc1012",
+  "identity": "ppscc1004",
   "password": "12345678"
 }
 

@@ -20,7 +20,7 @@ export async function register(req, res, next) {
 
     const token = await createToken(user);
     res.status(201).json({
-      status: "success",
+      status: true,
       message: "Register successful",
       token: token,
       user: {
@@ -45,7 +45,7 @@ export async function login(req, res, next) {
 
     const token = await createToken(user);
     res.status(200).json({
-      status: "success",
+      status: true,
       message: "Login successful",
       token: token,
       user: {
@@ -63,7 +63,7 @@ export async function getMe(req, res, next) {
   try {
     const user = await getCurrentUser(req.user.id);
     res.status(200).json({
-      status: "Success",
+      status: true,
       user,
     });
   } catch (error) {
