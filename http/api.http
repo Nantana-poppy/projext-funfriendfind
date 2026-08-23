@@ -85,7 +85,7 @@ GET {{BASE_URL}}/trips/5/requests
 Authorization: Bearer {{UserToken}}
 
 ### Accept Join Request
-PATCH {{BASE_URL}}/requests/2/accept
+PATCH {{BASE_URL}}/api/requests/2/accept
 Authorization: Bearer {{UserToken}}
 
 ### Reject Join Request
@@ -169,9 +169,3 @@ Authorization: Bearer {{UserToken}}
 ###
 GET /api/users/14/saved-trips
 Authorization: Bearer {{UserToken}}
-
-###
-PATCH /api/requests/:requestId/accept
-
-###
-PATCH /api/requests/:requestId/reject
