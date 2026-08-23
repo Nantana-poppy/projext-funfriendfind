@@ -33,7 +33,18 @@ export async function loginUser(identity, password) {
     where: {
       OR: [{ username: identity }, { email: identity }],
     },
+    select: {
+      id: true,
+      username: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      profileImage: true,
+      bio: true,
+      password: true,
+    },
   });
+
   if (!user) {
     throw createError(401, "Invalid username or email");
   }
@@ -41,7 +52,9 @@ export async function loginUser(identity, password) {
   if (!isPasswordValid) {
     throw createError(401, "Invalid password");
   }
-  return user;
+  // ไม่ส่ง password กลับไป
+  const { password: _, ...userWithoutPassword } = user;
+  return userWithoutPassword;
 }
 
 export async function getCurrentUser(userId) {

@@ -10,10 +10,10 @@ POST {{BASE_URL}}/auth/register
 Content-Type: application/json
 
 {
-  "username": "ppscc1020",
-  "email": "ppscc1020@gmail.com",
-  "firstName": "Nantana",
-  "lastName": "Santaweesuk",
+  "username": "ppscc1040",
+  "email": "ppscc1040@gmail.com",
+  "firstName": "Nantana40",
+  "lastName": "Santaweesuk40",
   "password": "12345678",
   "confirmPassword": "12345678"
 }
@@ -25,7 +25,7 @@ Content-Type: application/json
 
 {
 
-  "identity": "ppscc1004",
+  "identity": "ppscc1030",
   "password": "12345678"
 }
 
@@ -33,3 +33,145 @@ Content-Type: application/json
 # @name getMe
 GET {{BASE_URL}}/auth/me
 Authorization: Bearer {{UserToken}}
+
+### View Trips
+GET {{BASE_URL}}/trips
+
+### View Trip Detail
+GET {{BASE_URL}}/trips/4
+
+### Create trips
+POST {{BASE_URL}}/trips
+Authorization: Bearer {{UserToken}}
+Content-Type: application/json
+
+{
+      "title": "Japan Trip",
+      "destination": "Tokyo",
+      "description": "Travel japan",
+      "budget": 30000,
+      "startDate": "2026-12-10",
+      "endDate": "2026-12-15",
+      "maxMember": 5,
+      "categoryId": 2
+}
+
+### Edit trips
+PATCH {{BASE_URL}}/trips/4
+Authorization: bearer {{UserToken}}
+Content-Type: application/json
+
+{
+      "title": "Korea Trip",
+      "destination": "Korea",
+      "description": "Travel Korea",
+      "budget": 25000,
+      "startDate": "2026-12-10",
+      "endDate": "2026-12-15",
+      "maxMember": 7,
+      "categoryId": 1
+}
+
+### Delete trips
+DELETE {{BASE_URL}}/trips/2
+Authorization: bearer {{UserToken}}
+
+### Join Trip
+POST {{BASE_URL}}/trips/5/requests
+Authorization: Bearer {{UserToken}}
+
+### View Join Requests
+GET {{BASE_URL}}/trips/5/requests
+Authorization: Bearer {{UserToken}}
+
+### Accept Join Request
+PATCH {{BASE_URL}}/requests/2/accept
+Authorization: Bearer {{UserToken}}
+
+### Reject Join Request
+PATCH {{BASE_URL}}/requests/3/reject
+Authorization: Bearer {{UserToken}}
+
+### View Trip Members
+GET {{BASE_URL}}/trips/5/members
+Authorization: Bearer {{UserToken}}
+
+### Save Trip
+POST {{BASE_URL}}/trips/5/save
+Authorization: Bearer {{UserToken}}
+
+### View Categories
+GET {{BASE_URL}}/categories
+
+### View Profile
+GET {{BASE_URL}}/users/2
+Authorization: Bearer {{UserToken}}
+
+### Edit Profile
+PATCH {{BASE_URL}}/users/1
+Authorization: Bearer {{UserToken}}
+Content-Type: application/json
+
+{
+      "username": "Nicky",
+      "firstName": "Jooooooo",
+      "lastName": "Yooooooo",
+      "profileImage": null,
+      "bio": "Hello"
+}
+
+### Create Post
+POST {{BASE_URL}}/posts
+Authorization: Bearer {{UserToken}}
+Content-Type: application/json
+
+{
+  "caption": "My trip to Japan!",
+  "location": "Tokyo, Japan",
+  "images": [
+    "https://example.com/japan1.jpg",
+    "https://example.com/japan2.jpg"
+  ]
+}
+
+### View My Posts
+GET {{BASE_URL}}/users/1/posts
+Authorization: Bearer {{UserToken}}
+
+### View Post Detail
+GET {{BASE_URL}}/posts/3
+
+### Like Post
+POST {{BASE_URL}}/posts/4/like
+Authorization: Bearer {{UserToken}}
+
+### Create Comment
+POST {{BASE_URL}}/posts/1/comments
+Authorization: Bearer {{UserToken}}
+Content-Type: application/json
+
+{
+  "comment": "This trip looks amazing!"
+}
+
+### Follow User
+POST {{BASE_URL}}/users/3/follow
+Authorization: Bearer {{UserToken}}
+
+### View Saved Trips
+GET {{BASE_URL}}/users/2/saved-trips
+Authorization: Bearer {{UserToken}}
+
+###
+GET {{BASE_URL}}/:tripId/members
+Authorization: Bearer {{UserToken}}
+
+###
+GET /api/users/14/saved-trips
+Authorization: Bearer {{UserToken}}
+
+###
+PATCH /api/requests/:requestId/accept
+
+###
+PATCH /api/requests/:requestId/reject

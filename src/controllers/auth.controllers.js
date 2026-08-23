@@ -37,21 +37,25 @@ export async function register(req, res, next) {
 }
 
 export async function login(req, res, next) {
-  const { identity, password } = req.body;
   try {
     const result = loginSchema.parse(req.body);
-    console.log("result", result);
+
     const user = await loginUser(result.identity, result.password);
 
-    const token = await createToken(user);
+    const token = createToken(user);
+
     res.status(200).json({
       status: true,
       message: "Login successful",
-      token: token,
+      token,
       user: {
         id: user.id,
         username: user.username,
         email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        profileImage: user.profileImage,
+        bio: user.bio,
       },
     });
   } catch (error) {

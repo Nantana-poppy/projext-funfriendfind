@@ -8,23 +8,25 @@ datasource db {
 }
 
 model User {
-  id           Int          @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   firstName    String
   lastName     String
-  username     String       @unique
-  email        String       @unique
+  username     String        @unique
+  email        String        @unique
   password     String
   profileImage String?
   bio          String?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   comments     Comment[]
-  following    Follow[]     @relation("Follower")
-  followers    Follow[]     @relation("Following")
+  following    Follow[]      @relation("Follower")
+  followers    Follow[]      @relation("Following")
   likes        Like[]
   posts        Post[]
-  trips        Trip[]       @relation("TripOwner")
+  trips        Trip[]        @relation("TripOwner")
   tripMembers  TripMember[]
+  tripRequests TripRequest[]
+  savedTrips   SavedTrip[]
 }
 
 model Category {
@@ -100,20 +102,24 @@ model Follow {
 }
 
 model Trip {
-  id          Int          @id @default(autoincrement())
-  ownerId     Int
-  categoryId  Int
-  title       String
-  destination String
-  startDate   DateTime
-  endDate     DateTime
-  maxMember   Int
-  description String       @db.Text
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  category    Category     @relation(fields: [categoryId], references: [id])
-  owner       User         @relation("TripOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-  members     TripMember[]
+  id           Int           @id @default(autoincrement())
+  ownerId      Int
+  categoryId   Int
+  image        String?
+  title        String
+  destination  String
+  budget       Decimal
+  startDate    DateTime
+  endDate      DateTime
+  maxMember    Int
+  description  String?        @db.Text
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  category     Category      @relation(fields: [categoryId], references: [id])
+  owner        User          @relation("TripOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members      TripMember[]
+  tripRequests TripRequest[]
+  savedTrips   SavedTrip[]
 
   @@index([categoryId], map: "Trip_categoryId_fkey")
   @@index([ownerId], map: "Trip_ownerId_fkey")
@@ -126,7 +132,7 @@ model TripMember {
   status   TripStatus @default(PENDING)
   joinedAt DateTime   @default(now())
   trip     Trip       @relation(fields: [tripId], references: [id], onDelete: Cascade)
-  user     User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user     User       @relation(fields: [userId], references: [id])
 
   @@unique([tripId, userId])
   @@index([userId], map: "TripMember_userId_fkey")
@@ -136,4 +142,29 @@ enum TripStatus {
   PENDING
   ACCEPTED
   REJECTED
+}
+
+model TripRequest {
+  id        Int        @id @default(autoincrement())
+  tripId    Int
+  userId    Int
+  status    TripStatus @default(PENDING)
+  requestAt DateTime   @default(now())
+
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tripId, userId])
+}
+
+model SavedTrip {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  tripId    Int
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trip Trip @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, tripId])
 }
