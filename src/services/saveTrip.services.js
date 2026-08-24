@@ -9,7 +9,7 @@ export async function getSavedTrips(userId, targetUserId) {
     throw createError(400, "Invalid user ID");
   }
 
-  // ดูได้เฉพาะ Saved Trips ของตัวเอง
+  // ดูได้เฉพาะ Saved Trips ของตัวเอง user คนอื่นดูไม่ได้จ้า!!!
   if (currentUserId !== requestedUserId) {
     throw createError(403, "You can only view your own saved trips");
   }
@@ -47,5 +47,6 @@ export async function getSavedTrips(userId, targetUserId) {
     },
   });
 
+  console.log('getSavedTrips', getSavedTrips)
   return savedTrips;
 }

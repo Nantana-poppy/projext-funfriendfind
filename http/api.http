@@ -97,7 +97,7 @@ GET {{BASE_URL}}/trips/5/members
 Authorization: Bearer {{UserToken}}
 
 ### Save Trip
-POST {{BASE_URL}}/trips/5/save
+POST {{BASE_URL}}/api/trips/5/save
 Authorization: Bearer {{UserToken}}
 
 ### View Categories
