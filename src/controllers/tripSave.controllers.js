@@ -4,11 +4,13 @@ export async function saveTripController(req, res, next) {
   try {
     const { tripId } = req.params;
     const userId = req.user.id;
-    const savedTrip = await saveTrip(tripId, userId);
-    res.status(201).json({
+    const result = await saveTrip(tripId, userId);
+    res.status(200).json({
       status: true,
-      message: "Trip saved successfully",
-      data: savedTrip,
+      isSaved: result.isSaved,
+      message: result.message,
+      data: result.data || null,
+      tripId: result.tripId,
     });
   } catch (error) {
     next(error);

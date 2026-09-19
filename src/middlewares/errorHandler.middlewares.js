@@ -1,6 +1,7 @@
 import z from "zod";
 
 export function errorHandler(err, req, res, next) {
+  console.error("Backend Error:", err);
   if (err instanceof z.ZodError) {
     res.status(400).json({
       status: false,

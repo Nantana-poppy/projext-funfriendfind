@@ -2,7 +2,6 @@ import prisma from "../lib/prisma.js";
 import createError from "http-errors";
 
 export async function saveTrip(tripId, userId) {
-  console.log("savedTrip:", prisma.savedTrip);
   const id = Number(tripId);
 
   if (!Number.isInteger(id) || id < 1) {
@@ -19,8 +18,8 @@ export async function saveTrip(tripId, userId) {
     throw createError(404, "Trip not found");
   }
 
-  // Check ว่ากดบันทึกไปแล้วให้แจ้งเตือนกลับไป
-  const existingSavedTRip = await prisma.savedTrip.findUnique({
+  // Check if already saved
+  const existingSavedTrip = await prisma.savedTrip.findUnique({
     where: {
       userId_tripId: {
         userId,
@@ -29,10 +28,24 @@ export async function saveTrip(tripId, userId) {
     },
   });
 
-  if (existingSavedTRip) {
-    throw createError(409, "Trip has already been saved");
+  if (existingSavedTrip) {
+    // Unsave (remove from saved)
+    await prisma.savedTrip.delete({
+      where: {
+        userId_tripId: {
+          userId,
+          tripId: id,
+        },
+      },
+    });
+    return {
+      isSaved: false,
+      message: "Trip removed from saved trips",
+      tripId: id,
+    };
   }
 
+  // Save (create saved trip)
   const savedTrip = await prisma.savedTrip.create({
     data: {
       userId,
@@ -40,17 +53,31 @@ export async function saveTrip(tripId, userId) {
     },
     include: {
       trip: {
-        select: {
-          id: true,
-          title: true,
-          destination: true,
-          image: true,
-          startDate: true,
-          endDate: true,
-          budget: true,
+        include: {
+          owner: {
+            select: {
+              id: true,
+              username: true,
+              firstName: true,
+              lastName: true,
+              profileImage: true,
+            },
+          },
+          category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
         },
       },
     },
   });
-  return savedTrip;
+
+  return {
+    isSaved: true,
+    message: "Trip saved successfully",
+    data: savedTrip,
+    tripId: id,
+  };
 }

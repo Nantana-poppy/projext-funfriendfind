@@ -288,7 +288,7 @@ export async function deleteTrip(tripId, userId) {
 
   await prisma.trip.delete({
     where: {
-      id: tripId,
+      id: Number(tripId),
     },
   });
   return trip;

@@ -97,7 +97,7 @@ export async function deleteTripController(req, res, next) {
     await deleteTrip(req.tripId, userId);
 
     res.status(200).json({
-      success: true,
+      status: true,
       message: "Trip deleted successfully",
     });
   } catch (error) {
