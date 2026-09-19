@@ -69,6 +69,17 @@ export async function saveTrip(tripId, userId) {
               name: true,
             },
           },
+          members: {
+            select: {
+              id: true,
+              userId: true,
+            },
+          },
+          _count: {
+            select: {
+              members: true,
+            },
+          },
         },
       },
     },

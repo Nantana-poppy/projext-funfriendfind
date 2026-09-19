@@ -42,6 +42,17 @@ export async function getSavedTrips(userId, targetUserId) {
               name: true,
             },
           },
+          members: {
+            select: {
+              id: true,
+              userId: true,
+            },
+          },
+          _count: {
+            select: {
+              members: true,
+            },
+          },
         },
       },
     },
