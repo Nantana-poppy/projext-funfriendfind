@@ -36,9 +36,28 @@ export async function followUser(userId, targetUserId) {
   });
 
   if (existingFollow) {
-    throw createError(409, "User is already followed");
+    // Unfollow
+    await prisma.follow.delete({
+      where: {
+        followerId_followingId: {
+          followerId,
+          followingId,
+        },
+      },
+    });
+
+    const followersCount = await prisma.follow.count({
+      where: { followingId },
+    });
+
+    return {
+      isFollowing: false,
+      message: "Unfollowed successfully",
+      followersCount,
+    };
   }
 
+  // Follow
   const follow = await prisma.follow.create({
     data: {
       followerId,
@@ -46,5 +65,14 @@ export async function followUser(userId, targetUserId) {
     },
   });
 
-  return follow;
+  const followersCount = await prisma.follow.count({
+    where: { followingId },
+  });
+
+  return {
+    isFollowing: true,
+    message: "User followed successfully",
+    followersCount,
+    data: follow,
+  };
 }

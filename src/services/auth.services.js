@@ -69,6 +69,13 @@ export async function getCurrentUser(userId) {
       profileImage: true,
       bio: true,
       createdAt: true,
+      _count: {
+        select: {
+          followers: true,
+          following: true,
+          trips: true,
+        },
+      },
     },
   });
   if (!user) {

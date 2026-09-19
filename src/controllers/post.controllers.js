@@ -1,10 +1,12 @@
 import {
   createComment,
   createPost,
+  deletePost,
   getAllPosts,
   getPostById,
   getUserPosts,
   likePost,
+  updatePost,
 } from "../services/post.services.js";
 
 export async function getUserPostsController(req, res, next) {
@@ -96,3 +98,35 @@ export async function getAllPostsController(req, res, next) {
     next(error);
   }
 }
+
+export async function updatePostController(req, res, next) {
+  try {
+    const { postId } = req.params;
+    const userId = req.user.id;
+    const updatedPost = await updatePost(postId, userId, req.body);
+
+    res.status(200).json({
+      status: true,
+      message: "Post updated successfully",
+      data: updatedPost,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function deletePostController(req, res, next) {
+  try {
+    const { postId } = req.params;
+    const userId = req.user.id;
+    const result = await deletePost(postId, userId);
+
+    res.status(200).json({
+      status: true,
+      message: result.message,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+

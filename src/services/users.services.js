@@ -1,7 +1,7 @@
 import prisma from "../lib/prisma.js";
 import createError from "http-errors";
 
-export async function getUserProfile(userId) {
+export async function getUserProfile(userId, currentUserId) {
   const id = Number(userId);
 
   if (!Number.isInteger(id) || id < 1) {
@@ -25,6 +25,7 @@ export async function getUserProfile(userId) {
         select: {
           followers: true,
           following: true,
+          trips: true,
         },
       },
     },
@@ -34,7 +35,23 @@ export async function getUserProfile(userId) {
     throw createError(404, "User not found");
   }
 
-  return user;
+  let isFollowing = false;
+  if (currentUserId && Number(currentUserId) !== id) {
+    const followRecord = await prisma.follow.findUnique({
+      where: {
+        followerId_followingId: {
+          followerId: Number(currentUserId),
+          followingId: id,
+        },
+      },
+    });
+    isFollowing = !!followRecord;
+  }
+
+  return {
+    ...user,
+    isFollowing,
+  };
 }
 
 export async function editUserProfile(userId, userData) {
@@ -118,16 +135,22 @@ export async function getMyTrips(userId) {
         },
       },
       members: {
-        where: {
-          status: "ACCEPTED",
-        },
         select: {
           id: true,
           userId: true,
+        },
+      },
+      _count: {
+        select: {
+          members: true,
         },
       },
     },
   });
 
   return trips;
+}
+
+export async function getUserTrips(userId) {
+  return await getMyTrips(userId);
 }

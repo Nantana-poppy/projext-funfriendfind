@@ -4,12 +4,14 @@ export async function followUserController(req, res, next) {
   try {
     const followerId = req.user.id;
     const { userId } = req.params;
-    const follow = await followUser(followerId, userId);
+    const result = await followUser(followerId, userId);
 
-    res.status(201).json({
+    res.status(200).json({
       status: true,
-      message: "User followed successfully",
-      data: follow,
+      message: result.message,
+      isFollowing: result.isFollowing,
+      followersCount: result.followersCount,
+      data: result.data,
     });
   } catch (error) {
     next(error);

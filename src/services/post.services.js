@@ -40,6 +40,20 @@ export async function getUserPosts(userId) {
         },
       },
 
+      category: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+
+      images: {
+        select: {
+          id: true,
+          imageUrl: true,
+        },
+      },
+
       _count: {
         select: {
           likes: true,
@@ -337,3 +351,121 @@ export async function getAllPosts() {
 
   return posts;
 }
+
+export async function updatePost(postId, userId, postData) {
+  const id = Number(postId);
+
+  if (!Number.isInteger(id) || id < 1) {
+    throw createError(400, "Invalid post ID");
+  }
+
+  const existingPost = await prisma.post.findUnique({
+    where: { id },
+    include: { images: true },
+  });
+
+  if (!existingPost) {
+    throw createError(404, "Post not found");
+  }
+
+  if (existingPost.userId !== userId) {
+    throw createError(403, "You are not authorized to edit this post");
+  }
+
+  const { caption, location, categoryId, images } = postData;
+
+  if (caption !== undefined && (!caption || !caption.trim())) {
+    throw createError(400, "Caption cannot be empty");
+  }
+
+  if (images !== undefined && !Array.isArray(images)) {
+    throw createError(400, "Images must be an array");
+  }
+
+  const updatedPost = await prisma.$transaction(async (tx) => {
+    // If new images array provided, replace old images
+    if (images !== undefined) {
+      await tx.postImage.deleteMany({
+        where: { postId: id },
+      });
+
+      if (images.length > 0) {
+        await tx.postImage.createMany({
+          data: images.map((imageUrl) => ({
+            postId: id,
+            imageUrl,
+          })),
+        });
+      }
+    }
+
+    return await tx.post.update({
+      where: { id },
+      data: {
+        ...(caption !== undefined && { caption: caption.trim() }),
+        ...(location !== undefined && { location: location ? location.trim() : null }),
+        ...(categoryId !== undefined && {
+          categoryId: categoryId ? Number(categoryId) : null,
+        }),
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            firstName: true,
+            lastName: true,
+            profileImage: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        images: {
+          select: {
+            id: true,
+            imageUrl: true,
+          },
+        },
+        _count: {
+          select: {
+            likes: true,
+            comments: true,
+          },
+        },
+      },
+    });
+  });
+
+  return updatedPost;
+}
+
+export async function deletePost(postId, userId) {
+  const id = Number(postId);
+
+  if (!Number.isInteger(id) || id < 1) {
+    throw createError(400, "Invalid post ID");
+  }
+
+  const existingPost = await prisma.post.findUnique({
+    where: { id },
+  });
+
+  if (!existingPost) {
+    throw createError(404, "Post not found");
+  }
+
+  if (existingPost.userId !== userId) {
+    throw createError(403, "You are not authorized to delete this post");
+  }
+
+  await prisma.post.delete({
+    where: { id },
+  });
+
+  return { message: "Post deleted successfully" };
+}
+
